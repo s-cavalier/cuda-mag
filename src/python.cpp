@@ -38,7 +38,12 @@ CArray<NumT> magnus_one( size_t n, CArray_Coercible<NumT> data, double t0, doubl
     size_t n_samples = (size_t)(info.shape[0]);
     size_t dim = (size_t)(info.shape[1]);
 
-    if (n_samples == 0) throw py::value_error("data must have at least one sample");
+    if (n_samples < 16) throw py::value_error("data must have at least 16 samples");
+    if ( (n_samples - 1) % PyIntT::divisibility_requirement() != 0 ) {
+        std::string err_msg = "number of samples - 1 (i.e., total number of intervals) must be divisible by ";
+        err_msg += std::to_string(PyIntT::divisibility_requirement());
+        throw py::value_error(err_msg);
+    }
     if (dim == 0 || info.shape[2] != info.shape[1]) throw py::value_error("data must contain square matrices");
 
     if ( (n + 3) / 2 >= max_order() ) throw py::value_error("Current GL table is not large enough for given n");
@@ -72,7 +77,12 @@ CArray<NumT> magnus_many( size_t n, CArray_Coercible<NumT> data, double t0, doub
     size_t n_samples = (size_t)(info.shape[0]);
     size_t dim = (size_t)(info.shape[1]);
 
-    if (n_samples == 0) throw py::value_error("data must have at least one sample");
+    if (n_samples < 16) throw py::value_error("data must have at least 16 samples");
+    if ( (n_samples - 1) % PyIntT::divisibility_requirement() != 0 ) {
+        std::string err_msg = "number of samples - 1 (i.e., total number of intervals) must be divisible by ";
+        err_msg += std::to_string(PyIntT::divisibility_requirement());
+        throw py::value_error(err_msg);
+    }
     if (dim == 0 || info.shape[2] != info.shape[1]) throw py::value_error("data must contain square matrices");
 
     if ( (n + 3) / 2 >= max_order() ) throw py::value_error("Current GL table is not large enough for given n");
@@ -104,7 +114,12 @@ CArray<NumT> magnus_sum( size_t n, CArray_Coercible<NumT> data, double t0, doubl
     size_t n_samples = (size_t)(info.shape[0]);
     size_t dim = (size_t)(info.shape[1]);
 
-    if (n_samples == 0) throw py::value_error("data must have at least one sample");
+    if (n_samples < 16) throw py::value_error("data must have at least 16 samples");
+    if ( (n_samples - 1) % PyIntT::divisibility_requirement() != 0 ) {
+        std::string err_msg = "number of samples - 1 (i.e., total number of intervals) must be divisible by ";
+        err_msg += std::to_string(PyIntT::divisibility_requirement());
+        throw py::value_error(err_msg);
+    }
     if (dim == 0 || info.shape[2] != info.shape[1]) throw py::value_error("data must contain square matrices");
 
     if ( (n + 3) / 2 >= max_order() ) throw py::value_error("Current GL table is not large enough for given n");

@@ -5,12 +5,35 @@ from time import perf_counter
 from scipy.linalg import expm
 from scipy.integrate import solve_ivp
 
-X = np.array([[0, 1], [1, 0]])
-Z = np.array([[1, 0], [0, -1]])
+def get_H_func(k, w0, epsilon, delta, v0, T0):
+    """
+    Returns a function H(t) for the extended RZ model.
+    """
+    # 1. Define Pauli matrices
+    Z = np.array([[1, 0], [0, -1]])
+    X = np.array([[0, 1], [1, 0]])
 
-def Y(t):
-    return t * X + (1.0 - t) * Z
+    # 2. Define Mk (k x k tridiagonal symmetric matrix)
+    # Main diagonal 0, upper/lower diagonals 1
+    Mk = np.eye(k, k, k=1) + np.eye(k, k, k=-1)
 
+    # Identity matrix of size k
+    Ik = np.eye(k)
+
+    def H(t):
+        # Scalar real functions
+        omega_t = w0 + epsilon * np.cos(delta * t)
+        v_t = v0 / np.cosh(t / T0)
+
+        # H(t) := ̉̉ω(t)Z ⊗ Ik + v(t)X ⊗ Mk
+        term1 = omega_t * np.kron(Z, Ik)
+        term2 = v_t * np.kron(X, Mk)
+
+        return term1 + term2
+
+    return H
+
+Y = get_H_func(k=3, w0=1.0, epsilon=0.1, delta=2.0, v0=0.5, T0=1.0)
 
 def solve_matrix_ivp_at(coef, t, *, rtol=1e-10, atol=1e-12):
     y0 = np.asarray(coef(0.0), dtype=np.float64)
@@ -67,7 +90,7 @@ def omega2_bruteforce(A, t0, tf, sample_len, dtype=np.float64):
 
 T = 1
 
-n_samples = 257
+n_samples = 101
 t_samples = np.linspace(0, T, n_samples)
 a_samples = np.array([Y(t) for t in t_samples])
 
@@ -79,7 +102,7 @@ print(f"Samples: {n_samples}")
 print(f"SciPy solve_ivp runtime: {ivp_time:.6f}s")
 print("order | magnus_sum | expm      | total     | speedup vs ivp | max abs err")
 
-for n_order in [8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30]:
+for n_order in [6, 8, 10, 12, 14, 16, 18, 20, 22]:
     magnus_time, omega = median_runtime(
         lambda: magnus.sum(n=n_order, data=a_samples, t0=0, tf=T)
     )

@@ -20,6 +20,8 @@ namespace Magnus {
         requires std::same_as< typename T::matrix_span_t, MatrixSpan<typename T::numeric_t, typename T::matrix_policy_t> >;
         requires std::same_as<typename T::matrix_policy_t::numeric_t, typename T::numeric_t>;
 
+        { T::divisibility_requirement() } -> std::same_as<size_t>;
+
         { T( size_t{}, alloc ) };
         { integrator.prefix( data, double{} ) } -> std::same_as<void>;
         { integrator.sum( data, out, double{} ) } -> std::same_as<void>;
@@ -36,6 +38,8 @@ namespace Magnus {
         using matrix_policy_t = MatPolicyT;
         using matrix_t = MatrixView<NumT, MatPolicyT>;
         using matrix_span_t = MatrixSpan<NumT, MatPolicyT>;
+        
+        static constexpr size_t divisibility_requirement() { return 1; }
 
         DefaultIntegrator( size_t dim, const AllocatorT& alloc = AllocatorT() ) : tmp(dim, alloc) {}
 
@@ -64,6 +68,8 @@ namespace Magnus {
         using matrix_policy_t = MatPolicyT;
         using matrix_t = MatrixView<NumT, MatPolicyT>;
         using matrix_span_t = MatrixSpan<NumT, MatPolicyT>;
+
+        static constexpr size_t divisibility_requirement() { return 2; }
 
         TrapezoidalIntegrator(size_t dim, const AllocatorT& alloc = AllocatorT()) : tmp(dim, alloc) {}
 
@@ -102,6 +108,8 @@ namespace Magnus {
         using matrix_policy_t = MatPolicyT;
         using matrix_t = MatrixView<NumT, MatPolicyT>;
         using matrix_span_t = MatrixSpan<NumT, MatPolicyT>;
+
+        static constexpr size_t divisibility_requirement() { return 2; }
 
         SimpsonIntegrator(size_t dim, const AllocatorT& alloc = AllocatorT()) :
             scratch(dim, 3, alloc) {}
@@ -174,6 +182,8 @@ namespace Magnus {
         using matrix_policy_t = MatPolicyT;
         using matrix_t = MatrixView<NumT, MatPolicyT>;
         using matrix_span_t = MatrixSpan<NumT, MatPolicyT>;
+
+        static constexpr size_t divisibility_requirement() { return 4; }
 
         BooleIntegrator(size_t dim, const AllocatorT& alloc = AllocatorT()) :
             scratch(dim, 5, alloc) {}
